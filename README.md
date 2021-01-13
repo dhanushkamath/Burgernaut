@@ -1,2 +1,2 @@
 # Burgernaut
-A message-based food ordering system developed with RabbitMQ
+A message-based distributed food ordering system developed with RabbitMQ, Node.js, Express and MongoDB
