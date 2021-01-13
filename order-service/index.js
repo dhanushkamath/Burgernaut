@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const morgan = require('morgan');
+const { menuRouter } = require('./src/routes/menuRouter');
 const { orderRouter } = require('./src/routes/orderRouter')
 
 // environment variables
@@ -32,7 +33,7 @@ app.route('/api/info').get((req,res) =>{
         message: `Welcome to the Burgernaut order service!`
     })
 })
-
+app.use('/api/menu', menuRouter);
 app.use('/api/orders', orderRouter);
 
 app.listen(PORT, () => {

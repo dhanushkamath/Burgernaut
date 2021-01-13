@@ -13,13 +13,12 @@ const Order = mongoose.model('Order', orderSchema)
 const placeOrder = (req, res) => {
     let orderDetails = req.body;
 
-    // calculate total price
+    // calculate total amount
     orderDetails.total = orderDetails.items.reduce((currentTotal, item) => {
         return currentTotal + ITEM_PRICE[item.name]*item.quantity
     }, 0);
 
     let newOrder = new Order(orderDetails);
-    
     newOrder.save((err, order) => {
         if (err) {
             res.status(500).json({
