@@ -1,0 +1,14 @@
+{
+  "name": "email-service",
+  "version": "1.0.0",
+  "description": "An email service for Burgetnaut that sends order confirmations via email",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Dhanush Kamath",
+  "license": "ISC",
+  "dependencies": {
+    "amqplib": "^0.6.0"
+  }
+}
