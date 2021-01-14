@@ -29,7 +29,7 @@ const mongoConnect = () => {
 const changeOrderStatus = (OrderModel, orderId, status) => {
     OrderModel.findByIdAndUpdate(orderId, { status: status }, (err, order) => { 
         if (err){ 
-            console.err(err) 
+            console.error(err) 
         } 
         else{ 
             console.info(`${orderId} ${status}`); 
