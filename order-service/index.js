@@ -15,7 +15,7 @@ const PORT = process.env.PORT || 3000;
 // create an express app
 const app = express();
 
-// add basic logging
+// middleware to add basic logging
 app.use(morgan(MORGAN_CONFIG));
 
 // middleware to parse request
