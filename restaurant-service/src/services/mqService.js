@@ -20,13 +20,19 @@ const amqpConnectAndConsume = async () => {
         
         orderChannel = await mqConnection.createChannel();
         
+        var exchange = 'orders'
+        await orderChannel.assertExchange(exchange, 'fanout', {
+            durable: false
+        });
+
         // Ensure that the queue exists or create one if it doesn't
-        const result = await orderChannel.assertQueue("orders");
+        await orderChannel.assertQueue("order-queue");
+        await orderChannel.bindQueue("order-queue", exchange, '');
 
         // Only process <PREFETCH_COUNT> orders at a time
         orderChannel.prefetch(PREFETCH_COUNT);
 
-        orderChannel.consume("orders", order => {
+        orderChannel.consume("order-queue", order => {
             processOrder(order, orderChannel);
         });
     }
