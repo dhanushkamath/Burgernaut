@@ -6,8 +6,13 @@ const connect = async () => {
     try {
         const mqConnection = await amqp.connect("amqp://localhost:5672");
         const channel = await mqConnection.createChannel();
-        const result = channel.assertQueue("orders"); // Ensure that the queue exists or create one
-        channel.sendToQueue("orders", Buffer.from(JSON.stringify(msg)));
+        
+        var exchange = "orders"
+        const result =  await channel.assertExchange(exchange, 'fanout', {
+            durable: false
+        });
+       // Ensure that the exchange exists or create one
+        channel.publish(exchange, '', Buffer.from(JSON.stringify(msg)));
         console.log(`order placed`);
         return channel;
     }

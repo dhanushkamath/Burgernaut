@@ -4,6 +4,7 @@ const amqp = require("amqplib");
 const MQ_HOST = process.env.MQ_HOST || 'localhost';
 const MQ_URL = `amqp://${MQ_HOST}:5672`;
 let orderChannel = null;
+var exchange = "orders"
 
 /**
  * Connect to RabbitMQ
@@ -11,12 +12,14 @@ let orderChannel = null;
 const amqpConnect = async () => {
     try {
         const mqConnection = await amqp.connect(MQ_URL);
-        console.info("AMQP connection established")
-        
         orderChannel = await mqConnection.createChannel();
         
-        // Ensure that the queue exists or create one if it doesn't
-        const result = await orderChannel.assertQueue("orders");
+        await orderChannel.assertExchange(exchange, 'fanout', {
+            durable: false
+        });
+
+        console.info("AMQP connection established")
+        
     }
     catch (ex) {
         console.error(ex);
@@ -27,8 +30,8 @@ const amqpConnect = async () => {
  * Publish order to queue
  * @param {Object} order - order object containing order details
  */
-const publishOrderToQueue = (order) => {
-    orderChannel.sendToQueue("orders", Buffer.from(JSON.stringify(order)));
+const publishOrderToExchange = (order) => {
+    orderChannel.publish(exchange,'', Buffer.from(JSON.stringify(order)));
     console.info(`order ${order._id} placed`);
 }
 
@@ -38,13 +41,13 @@ const publishOrderToQueue = (order) => {
  * @param {Object} res - express response object.
  * @param {Function} next - express next() function.
  */
-const injectQueueServices = (req, res, next) => {
+const injectExchangeServices = (req, res, next) => {
     // Add all queue operations here
-    const queueServices = {
-        publishOrderToQueue: publishOrderToQueue
+    const exchangeServices = {
+        publishOrderToExchange: publishOrderToExchange
     }
     
-    req.queueServices = queueServices;
+    req.exchangeServices = exchangeServices;
     next();
 }
 
@@ -52,5 +55,5 @@ const injectQueueServices = (req, res, next) => {
 amqpConnect();
 
 module.exports = {
-    injectQueueServices: injectQueueServices
+    injectExchangeServices: injectExchangeServices
 }

@@ -1,5 +1,5 @@
 const amqp = require("amqplib");
-const { processOrder } = require('../controllers/orderController')
+const { sendConfirmation } = require('../controllers/emailController')
 
 
 // environment variables
@@ -20,20 +20,21 @@ const amqpConnectAndConsume = async () => {
         
         orderChannel = await mqConnection.createChannel();
         
-        var exchange = 'orders'
+        var exchange = 'orders';
         await orderChannel.assertExchange(exchange, 'fanout', {
             durable: false
         });
 
         // Ensure that the queue exists or create one if it doesn't
-        await orderChannel.assertQueue("order-queue");
-        await orderChannel.bindQueue("order-queue", exchange, '');
+        await orderChannel.assertQueue("email-queue");
+        await orderChannel.bindQueue("email-queue", exchange, '');
+        
 
         // Only process <PREFETCH_COUNT> orders at a time
         orderChannel.prefetch(PREFETCH_COUNT);
 
-        orderChannel.consume("order-queue", order => {
-            processOrder(order, orderChannel);
+        orderChannel.consume("email-queue", order => {
+            sendConfirmation(order, orderChannel);
         });
     }
     catch (ex) {

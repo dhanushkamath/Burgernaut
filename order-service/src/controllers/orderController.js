@@ -21,7 +21,7 @@ const placeOrder = (req, res) => {
     let newOrder = new Order(orderDetails);
     newOrder.save((err, order) => {
         // place the order on the queue
-        req.queueServices.publishOrderToQueue(order); 
+        req.exchangeServices.publishOrderToExchange(order); 
         
         if (err) {
             console.error(err);

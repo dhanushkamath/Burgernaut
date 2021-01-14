@@ -7,7 +7,7 @@ const { MORGAN_CONFIG } = require('./src/resources/constants')
 const { mongoService } = require('./src/services/mongoService');
 
 // message-queue services
-const { injectQueueServices } = require('./src/services/mqService');
+const { injectExchangeServices } = require('./src/services/mqService');
 
 // environment variables
 const PORT = process.env.PORT || 3000;
@@ -22,7 +22,7 @@ app.use(morgan(MORGAN_CONFIG));
 app.use(express.json());
 
 // middleware to inject message-queue services
-app.use(injectQueueServices);
+app.use(injectExchangeServices);
 
 // add all routes
 addRoutes(app);

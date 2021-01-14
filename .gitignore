@@ -1,5 +1,7 @@
 node_modules
 **/node_modules
+email-service/email-test.js
+email-service/src/resources/emailCredentials.js
 
 .DS_Store
 
