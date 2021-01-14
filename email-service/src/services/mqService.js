@@ -1,5 +1,5 @@
 const amqp = require("amqplib");
-const { sendConfirmation } = require('../controllers/orderController')
+const { sendConfirmation } = require('../controllers/emailController')
 
 
 // environment variables
