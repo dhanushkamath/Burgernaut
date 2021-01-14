@@ -1,0 +1,14 @@
+{
+  "name": "restaurant-service",
+  "version": "1.0.0",
+  "description": "A restaurant service for Burgernaut that consums orders from the queue and updates the order status.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Dhanush Kamath",
+  "license": "ISC",
+  "dependencies": {
+    "amqplib": "^0.6.0"
+  }
+}

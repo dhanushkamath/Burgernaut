@@ -10,6 +10,7 @@
   "author": "Dhanush Kamath",
   "license": "ISC",
   "dependencies": {
+    "amqplib": "^0.6.0",
     "express": "^4.17.1",
     "mongoose": "^5.11.11",
     "morgan": "^1.10.0"

@@ -1,41 +1,32 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const morgan = require('morgan');
-const { menuRouter } = require('./src/routes/menuRouter');
-const { orderRouter } = require('./src/routes/orderRouter')
+const { addRoutes } = require('./src/routes/api')
+const { MORGAN_CONFIG } = require('./src/resources/constants')
+
+// mongo connection
+const { mongoService } = require('./src/services/mongoService');
+
+// message-queue services
+const { injectQueueServices } = require('./src/services/mqService');
 
 // environment variables
 const PORT = process.env.PORT || 3000;
-const MONGO_CONTAINER_NAME = process.env.MONGO_CONTAINER_NAME || 'localhost';
 
 // create an express app
 const app = express();
 
 // add basic logging
-app.use(morgan(':method :url :status :res[content-length] :remote-addr - :response-time ms'));
+app.use(morgan(MORGAN_CONFIG));
 
 // middleware to parse request
 app.use(express.json());
 
-// mongoDB connection
-mongoose.Promise = global.Promise;
-mongoose.connect(`mongodb://${MONGO_CONTAINER_NAME}:27017/burgernautDB`, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-},(err) => {
-    if(err) {
-        console.error('ERROR ' + err)
-    }
-})
+// middleware to inject message-queue services
+app.use(injectQueueServices);
 
-app.route('/api/info').get((req,res) =>{
-    res.json({
-        message: `Welcome to the Burgernaut order service!`
-    })
-})
-app.use('/api/menu', menuRouter);
-app.use('/api/orders', orderRouter);
+// add all routes
+addRoutes(app);
 
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`)
+    console.info(`Order-service listening on port ${PORT}`)
 })

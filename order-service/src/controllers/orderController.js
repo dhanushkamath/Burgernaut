@@ -20,11 +20,15 @@ const placeOrder = (req, res) => {
 
     let newOrder = new Order(orderDetails);
     newOrder.save((err, order) => {
+        // place the order on the queue
+        req.queueServices.publishOrderToQueue(order); 
+        
         if (err) {
             res.status(500).json({
                 error: `An unknown server error occurred.`
             });
         }
+
         res.status(201).json(order);
     })
 }
