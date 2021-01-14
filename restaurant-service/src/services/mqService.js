@@ -1,6 +1,10 @@
 const amqp = require("amqplib");
 const { processOrder } = require('../controllers/orderController')
 
+
+// environment variables
+const PREFETCH_COUNT = process.env.PREFETCH_COUNT || 2;
+
 // create MQ connection string using environment variable
 const MQ_HOST = process.env.MQ_HOST || 'localhost';
 const MQ_URL = `amqp://${MQ_HOST}:5672`;
@@ -19,11 +23,11 @@ const amqpConnectAndConsume = async () => {
         // Ensure that the queue exists or create one if it doesn't
         const result = await orderChannel.assertQueue("orders");
 
+        // Only process <PREFETCH_COUNT> orders at a time
+        orderChannel.prefetch(PREFETCH_COUNT);
+
         orderChannel.consume("orders", order => {
-            orderContent = JSON.parse(order.content.toString());
-            console.info(`${orderContent._id} received`)
-            processOrder(orderContent._id);
-            orderChannel.ack(order);
+            processOrder(order, orderChannel);
         });
     }
     catch (ex) {
