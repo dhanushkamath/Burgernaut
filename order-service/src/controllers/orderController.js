@@ -24,6 +24,7 @@ const placeOrder = (req, res) => {
         req.queueServices.publishOrderToQueue(order); 
         
         if (err) {
+            console.error(err);
             res.status(500).json({
                 error: `An unknown server error occurred.`
             });
@@ -41,6 +42,8 @@ const placeOrder = (req, res) => {
 const getOrderById = (req,res) => {
     Order.findById(req.params.orderId).select('-__v -items._id').exec((err, order) => {
         if (err) {
+            console.log(`Error Name: ${err.name}: ${err.message}`)
+            console.error(err);
             res.status(500).json({
                 error: `An unknown server error occurred.`
             });

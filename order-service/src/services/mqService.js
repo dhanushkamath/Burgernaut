@@ -3,9 +3,11 @@ const amqp = require("amqplib");
 // create MQ connection string using environment variable
 const MQ_HOST = process.env.MQ_HOST || 'localhost';
 const MQ_URL = `amqp://${MQ_HOST}:5672`;
-
-// establish mq connection
 let orderChannel = null;
+
+/**
+ * Connect to RabbitMQ
+ */
 const amqpConnect = async () => {
     try {
         const mqConnection = await amqp.connect(MQ_URL);
@@ -14,13 +16,12 @@ const amqpConnect = async () => {
         orderChannel = await mqConnection.createChannel();
         
         // Ensure that the queue exists or create one if it doesn't
-        const result = orderChannel.assertQueue("orders");
+        const result = await orderChannel.assertQueue("orders");
     }
     catch (ex) {
         console.error(ex);
     }
 }
-amqpConnect();
 
 /**
  * Publish order to queue
@@ -46,6 +47,9 @@ const injectQueueServices = (req, res, next) => {
     req.queueServices = queueServices;
     next();
 }
+
+// establish mq connection
+amqpConnect();
 
 module.exports = {
     injectQueueServices: injectQueueServices
