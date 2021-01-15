@@ -1,5 +1,6 @@
 const amqp = require("amqplib");
 const { sendConfirmation } = require('../controllers/emailController')
+const { logger } = require('./loggerService')
 
 
 // environment variables
@@ -16,7 +17,7 @@ let orderChannel = null;
 const amqpConnectAndConsume = async () => {
     try {
         const mqConnection = await amqp.connect(MQ_URL);
-        console.info("AMQP connection established")
+        logger.info(`AMQP - connection established at ${MQ_URL}`)
         
         orderChannel = await mqConnection.createChannel();
         
@@ -38,7 +39,7 @@ const amqpConnectAndConsume = async () => {
         });
     }
     catch (ex) {
-        console.error(ex);
+        logger.level('fatal', ex);
     }
 }
 

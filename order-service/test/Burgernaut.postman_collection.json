@@ -1,0 +1,79 @@
+{
+	"variables": [],
+	"info": {
+		"name": "Burgernaut",
+		"_postman_id": "ace6e748-71f5-18eb-2888-c1830918c211",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "order-service",
+			"description": "",
+			"item": [
+				{
+					"name": "get-menu",
+					"request": {
+						"url": "localhost:3000/api/menu",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": "Test the food order service."
+					},
+					"response": []
+				},
+				{
+					"name": "test-service",
+					"request": {
+						"url": "localhost:3000/api/info",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": "Test the food order service."
+					},
+					"response": []
+				},
+				{
+					"name": "place-order",
+					"request": {
+						"url": "localhost:3000/api/orders",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"items\": [\n\t\t{\"name\": \"burger\", \"quantity\": 10},\n\t\t{\"name\": \"fries\", \"quantity\": 20}\n\t],\n\t\"email\": \"test@gmail.com\"\n}"
+						},
+						"description": "Place a food order at Burgernaut"
+					},
+					"response": []
+				},
+				{
+					"name": "track-order",
+					"request": {
+						"url": "localhost:3000/api/orders/6001c2ea59895924e07b341b",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"items\": [\n\t\t{\"name\": \"burger\", \"quantity\": 3},\n\t\t{\"name\": \"fries\", \"quantity\": 2}\n\t]\n}"
+						},
+						"description": "Place a food order at Burgernaut"
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

@@ -10,7 +10,7 @@ const Order = mongoose.model('Order', orderSchema)
  * @param {Object} req - Express request object.
  * @param {Object} res - Express response object.
  */
-const placeOrder = (req, res) => {
+const placeOrder = (req, res, next) => {
     let orderDetails = req.body;
 
     // calculate total amount
@@ -20,15 +20,12 @@ const placeOrder = (req, res) => {
 
     let newOrder = new Order(orderDetails);
     newOrder.save((err, order) => {
+        if (err) {
+            // forward to express error handling middleware
+            return next(err);
+        }
         // place the order on the queue
         req.exchangeServices.publishOrderToExchange(order); 
-        
-        if (err) {
-            console.error(err);
-            res.status(500).json({
-                error: `An unknown server error occurred.`
-            });
-        }
 
         res.status(201).json(order);
     })
@@ -39,14 +36,11 @@ const placeOrder = (req, res) => {
  * @param {Object} req - Express request object.
  * @param {Object} res - Express response object.
  */
-const getOrderById = (req,res) => {
+const getOrderById = (req,res, next) => {
     Order.findById(req.params.orderId).select('-__v -items._id').exec((err, order) => {
         if (err) {
-            console.log(`Error Name: ${err.name}: ${err.message}`)
-            console.error(err);
-            res.status(500).json({
-                error: `An unknown server error occurred.`
-            });
+            // forward to express error handling middleware
+            return next(err);
         }
         res.status(200).json(order);
     })

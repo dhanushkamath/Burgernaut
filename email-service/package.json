@@ -4,12 +4,17 @@
   "description": "An email service for Burgetnaut that sends order confirmations via email",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node ./index.js",
+    "dev": "nodemon ./index.js"
   },
   "author": "Dhanush Kamath",
   "license": "ISC",
   "dependencies": {
     "amqplib": "^0.6.0",
-    "nodemailer": "^6.4.17"
+    "nodemailer": "^6.4.17",
+    "winston": "^3.3.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
   }
 }

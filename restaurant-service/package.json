@@ -4,12 +4,17 @@
   "description": "A restaurant service for Burgernaut that consumes orders from the queue and updates the order status.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node ./index.js",
+    "dev": "nodemon ./index.js"
   },
   "author": "Dhanush Kamath",
   "license": "ISC",
   "dependencies": {
     "amqplib": "^0.6.0",
-    "mongoose": "^5.11.11"
+    "mongoose": "^5.11.11",
+    "winston": "^3.3.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
   }
 }

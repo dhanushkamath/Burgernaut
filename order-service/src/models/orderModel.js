@@ -8,11 +8,13 @@ const Schema = mongoose.Schema;
 itemSchema = new Schema({
     name: {
         type: String,
-        default: ""
+        default: "",
+        required: true
     },
     quantity: {
         type: Number,
-        default: 0
+        default: 0,
+        required: true
     }
 })
 
@@ -22,6 +24,7 @@ itemSchema = new Schema({
 orderSchema = new Schema({
     items: {
         type: [itemSchema],
+        required: true
     },
     createdAt: {
         type: Date,
@@ -35,9 +38,18 @@ orderSchema = new Schema({
         type: String,
         enum: ['pending', 'accepted', 'delivered'],
         default: 'pending'
+    },
+    email: {
+        type: String,
+        required: true
     }
 })
-  
+
+orderSchema.path('email').validate(function (email) {
+    var emailRegex = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+    return emailRegex.test(email); // Assuming email has a text attribute
+ }, 'Invalid e-mail.')
+
 module.exports = {
     orderSchema: orderSchema
 }

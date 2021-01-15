@@ -1,23 +1,28 @@
 const { sendEmail } = require('../services/emailService');
-const { EMAIL_ID, TO_EMAIL_ID} = require('../resources/emailCredentials');
+const { logger } = require('../services/loggerService');
+const { EMAIL_SUBJECT, EMAIL_TEXT_DEFAULT } = require('../resources/constants');
+
+const EMAIL_ID = process.env.EMAIL_ID;
 
 var mailOptions = {
     from: EMAIL_ID,
-    to: TO_EMAIL_ID,
-    subject: 'Burgernaut Order Confirmation',
-    text: 'Thank you for ordering from Burgernaut. '
+    to: '',
+    subject: EMAIL_SUBJECT,
+    text: EMAIL_TEXT_DEFAULT
   };
+  
 /**
  * Send an email confirmation.
  */
 const sendConfirmation = (order, orderChannel) => {
     orderContent = JSON.parse(order.content.toString());
     mailOptions.text += `Your order ${orderContent._id} amounting to ${orderContent.total} is confirmed and will be delivered shortly.`
+    mailOptions.to = orderContent.email;
     sendEmail(mailOptions, (error, info) => {
         if (error) {
-            console.log(error);
+            logger.log('crit',`email - failed to send confirmation to ${orderContent.email} for order ${orderContent._id}.`)
         } else {
-            console.log(`${orderContent._id} confirmation sent:  ${info.response}`);
+            logger.info(`email - confirmation sent to ${orderContent.email} for order ${orderContent._id}.`);
             orderChannel.ack(order);
         }
       })
