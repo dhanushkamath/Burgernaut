@@ -1,7 +1,8 @@
-const ORDER_ACCEPTED = 'accepted';
-const ORDER_DELIVERED = 'delivered';
+const EMAIL_SUBJECT = 'Burgernaut Order Confirmation';
+const EMAIL_TEXT_DEFAULT = 'Thank you for ordering from Burgernaut. ';
 
 module.exports = {
-    ORDER_ACCEPTED: ORDER_ACCEPTED,
-    ORDER_DELIVERED: ORDER_DELIVERED
+    EMAIL_SUBJECT: EMAIL_SUBJECT,
+    EMAIL_TEXT_DEFAULT: EMAIL_TEXT_DEFAULT
+    
 }
