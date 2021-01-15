@@ -1,5 +1,7 @@
 var nodemailer = require('nodemailer');
-const { EMAIL_ID, EMAIL_PWD} = require('../resources/emailCredentials');
+
+const EMAIL_ID = process.env.EMAIL_ID;
+const EMAIL_PWD = process.env.EMAIL_PWD;
 
 var transporter = nodemailer.createTransport({
   service: 'gmail',

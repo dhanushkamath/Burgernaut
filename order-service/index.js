@@ -2,6 +2,7 @@ const express = require('express');
 const morgan = require('morgan');
 const { addRoutes } = require('./src/routes/api')
 const { MORGAN_CONFIG } = require('./src/resources/constants')
+const { logger } = require('./src/services/logger')
 
 // mongo connection
 const { mongoService } = require('./src/services/mongoService');
@@ -16,7 +17,7 @@ const PORT = process.env.PORT || 3000;
 const app = express();
 
 // middleware to add basic logging
-app.use(morgan(MORGAN_CONFIG));
+app.use(morgan(MORGAN_CONFIG, { stream: logger.stream }));
 
 // middleware to parse request
 app.use(express.json());
@@ -27,6 +28,12 @@ app.use(injectExchangeServices);
 // add all routes
 addRoutes(app);
 
+app.use((err, req, res, next) => {
+    logger.warn(err);
+    logger.log("trace", err.stack);
+})
+
+
 app.listen(PORT, () => {
-    console.info(`Order-service listening on port ${PORT}`)
+    logger.info(`Order-service listening on port ${PORT}`);
 })

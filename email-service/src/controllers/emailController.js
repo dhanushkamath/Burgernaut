@@ -1,5 +1,7 @@
 const { sendEmail } = require('../services/emailService');
-const { EMAIL_ID, TO_EMAIL_ID} = require('../resources/emailCredentials');
+
+const EMAIL_ID = process.env.EMAIL_ID;
+const TO_EMAIL_ID = process.env.TO_EMAIL_ID;
 
 var mailOptions = {
     from: EMAIL_ID,
