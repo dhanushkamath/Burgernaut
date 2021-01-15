@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const { logger } = require('./loggerService')
 
 // environment variables
-const MONGO_CONTAINER_NAME = process.env.MONGO_CONTAINER_NAME || 'localhost';
+const MONGO_CONTAINER_NAME = process.env.MONGO_HOST || 'localhost';
 const MONGO_URI = `mongodb://${MONGO_CONTAINER_NAME}:27017/burgernautDB`;
 
 
@@ -17,7 +17,8 @@ const mongoConnect = () => {
         useFindAndModify: false
     }, (err) => {  
         if(err) {
-            console.error('Mongo ERROR ' + err)
+            logger.log('fatal', err);
+            logger.log('trace', err.stack);
         }
     })
     mongoose.connection.on('connected', function () {  

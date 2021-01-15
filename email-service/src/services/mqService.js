@@ -1,12 +1,7 @@
 const amqp = require("amqplib");
 const { sendConfirmation } = require('../controllers/emailController')
 const { logger } = require('./loggerService')
-
-
-// environment variables
-const PREFETCH_COUNT = process.env.PREFETCH_COUNT || 2;
-
-// create MQ connection string using environment variable
+const PREFETCH_COUNT = parseInt(process.env.PREFETCH_COUNT) || 2;
 const MQ_HOST = process.env.MQ_HOST || 'localhost';
 const MQ_URL = `amqp://${MQ_HOST}:5672`;
 let orderChannel = null;
@@ -31,7 +26,7 @@ const amqpConnectAndConsume = async () => {
         await orderChannel.bindQueue("email-queue", exchange, '');
         
 
-        // Only process <PREFETCH_COUNT> orders at a time
+        // Only send <PREFETCH_COUNT> emails at a time
         orderChannel.prefetch(PREFETCH_COUNT);
 
         orderChannel.consume("email-queue", order => {
@@ -39,7 +34,8 @@ const amqpConnectAndConsume = async () => {
         });
     }
     catch (ex) {
-        logger.level('fatal', ex);
+        logger.log('fatal',`AMQP - ${ex}`);
+        process.exit();
     }
 }
 

@@ -7,7 +7,7 @@ const { ORDER_ACCEPTED, ORDER_DELIVERED } = require('../resources/constants')
 const OrderModel = mongoose.model('Order', orderSchema)
 
 // environment variables
-const ORDER_DELIVERY_TIME = process.env.ORDER_DELIVERY_TIME || 10000;
+const ORDER_DELIVERY_TIME = parseInt(process.env.ORDER_DELIVERY_TIME) || 10000;
 
 /**
  * Process the order.

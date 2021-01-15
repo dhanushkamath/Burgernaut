@@ -1,0 +1,64 @@
+# YML version
+version: '3'
+
+# Define all the services our book application needs
+services:
+  order-service:  # node application
+    restart: always # automatically restart if the app fails
+    build: ./order-service # build the image from the dockerfile present in the order-service directory
+    image: dhanushkamath/burgernaut-order-service:1.0.0
+    depends_on:
+      - mongo
+      - rabbitmq
+    environment: # environment variables
+      - PORT=3000
+      - MQ_HOST=rabbitmq
+      - MONGO_HOST=mongo # this should be the same as the name of the DB service below
+      - SLEEP_TIME=20000
+    ports: 
+      - '3000:3000' # map the ports as <host-port>:<container-port . The container-port should be the same as the PORT defined in environment.
+  
+  restaurant-service:  # node application
+    restart: always # automatically restart if the app fails
+    build: ./restaurant-service # build the image from the dockerfile present in the restaurant-service directory
+    image: dhanushkamath/burgernaut-restaurant-service:1.0.0
+    depends_on:
+      - mongo
+      - rabbitmq
+    environment: # environment variables
+      - MQ_HOST=rabbitmq
+      - MONGO_HOST=mongo # this should be the same as the name of the DB service below
+      - PREFETCH_COUNT=3 # Max orders that can be processed simultaneously
+      - SLEEP_TIME=20000
+  
+  email-service:  # node application
+    restart: always # automatically restart if the app fails
+    build: ./email-service # build the image from the dockerfile present in the restaurant-service directory
+    image: dhanushkamath/burgernaut-email-service:1.0.0
+    depends_on:
+      - rabbitmq
+    environment: # environment variables
+      - MQ_HOST=rabbitmq
+      - PREFETCH_COUNT=3 # Max orders that can be processed simultaneously
+      - EMAIL_ID=test@gmail.com # Enter email of service account
+      - EMAIL_PWD=test1234 # Enter password of service account
+      - EMAIL_SERVICE=gmail # Enter email service 
+      - SLEEP_TIME=20000
+  
+
+  mongo: # database
+    image: mongo:4.2 # pull the mongo image from docker hub
+    logging:
+      driver: none
+    ports:
+      - '27017:27017'
+  
+  rabbitmq: # rabbitmq
+    image: rabbitmq:3.8.9 # pull the rabbitmq image from  dockerhub
+    logging:
+      driver: none
+    ports:
+      - '5672:5672'
+        
+
+    

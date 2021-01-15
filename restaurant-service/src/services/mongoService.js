@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const { logger } = require('./loggerService');
 
 // environment variables
-const MONGO_CONTAINER_NAME = process.env.MONGO_CONTAINER_NAME || 'localhost';
+const MONGO_CONTAINER_NAME = process.env.MONGO_HOST || 'localhost';
 const MONGO_URI = `mongodb://${MONGO_CONTAINER_NAME}:27017/burgernautDB`;
 
 /**
