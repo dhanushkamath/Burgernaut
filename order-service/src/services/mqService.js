@@ -1,4 +1,5 @@
 const amqp = require("amqplib");
+const { logger } = require('./loggerService')
 
 // create MQ connection string using environment variable
 const MQ_HOST = process.env.MQ_HOST || 'localhost';
@@ -18,13 +19,15 @@ const amqpConnect = async () => {
             durable: false
         });
 
-        console.info("AMQP connection established")
+        logger.info(`AMQP - connection established at ${MQ_URL}`)
         
     }
     catch (ex) {
-        console.error(ex);
+        logger.log('fatal',`AMQP - ${ex}`);
+        process.exit();
     }
 }
+
 
 /**
  * Publish order to queue
@@ -32,7 +35,7 @@ const amqpConnect = async () => {
  */
 const publishOrderToExchange = (order) => {
     orderChannel.publish(exchange,'', Buffer.from(JSON.stringify(order)));
-    console.info(`order ${order._id} placed`);
+    logger.info(`AMQP - order ${order._id} placed`);
 }
 
 /**
@@ -41,8 +44,8 @@ const publishOrderToExchange = (order) => {
  * @param {Object} res - express response object.
  * @param {Function} next - express next() function.
  */
-const injectExchangeServices = (req, res, next) => {
-    // Add all queue operations here
+const injectExchangeService = (req, res, next) => {
+    // Add all exchange operations here
     const exchangeServices = {
         publishOrderToExchange: publishOrderToExchange
     }
@@ -55,5 +58,5 @@ const injectExchangeServices = (req, res, next) => {
 amqpConnect();
 
 module.exports = {
-    injectExchangeServices: injectExchangeServices
+    injectExchangeService: injectExchangeService
 }
