@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "amqplib": "^0.6.0",
-    "mongoose": "^5.11.11"
+    "mongoose": "^5.11.11",
+    "winston": "^3.3.3"
   }
 }

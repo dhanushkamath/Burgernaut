@@ -1,4 +1,5 @@
 const { sendEmail } = require('../services/emailService');
+const { logger } = require('../services/loggerService')
 
 const EMAIL_ID = process.env.EMAIL_ID;
 const TO_EMAIL_ID = process.env.TO_EMAIL_ID;
@@ -17,9 +18,9 @@ const sendConfirmation = (order, orderChannel) => {
     mailOptions.text += `Your order ${orderContent._id} amounting to ${orderContent.total} is confirmed and will be delivered shortly.`
     sendEmail(mailOptions, (error, info) => {
         if (error) {
-            console.log(error);
+            logger.log('crit',`email - failed to send confirmation to ${orderContent.email} for order ${orderContent._id}.`)
         } else {
-            console.log(`${orderContent._id} confirmation sent:  ${info.response}`);
+            logger.info(`email - confirmation sent to ${orderContent.email} for order ${orderContent._id}.`);
             orderChannel.ack(order);
         }
       })

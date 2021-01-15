@@ -1,12 +1,13 @@
 const express = require('express');
 const morgan = require('morgan');
-const { addRoutes } = require('./src/routes/api')
-const { MORGAN_CONFIG } = require('./src/resources/constants')
-const { logger } = require('./src/services/loggerService')
-const { errorHandlerMiddleware } = require('./src/services/errorHandlingService')
+const { addRoutes } = require('./src/routes/api');
+const { MORGAN_CONFIG } = require('./src/resources/constants');
+const { logger } = require('./src/services/loggerService');
+const { errorHandlerMiddleware } = require('./src/services/errorHandlingService');
+const { mongoConnect } = require('./src/services/mongoService');
 
 // mongo connection
-const { mongoService } = require('./src/services/mongoService');
+mongoConnect();
 
 // amqp exchange services
 const { injectExchangeService } = require('./src/services/mqService');
