@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
 });
 
 /**
- * Connect to RabbitMQ and consumer orders
+ * Send Email.
  */
 const sendEmail = (mailOptions, callback) => {
     return transporter.sendMail(mailOptions, callback);
