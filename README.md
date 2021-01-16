@@ -59,7 +59,7 @@ Run the `install` and `start` commands for email-service, order-service and rest
 ## API
 ## Get menu
 ----
-  Returns json data containing details of all books.
+  Returns json data containing menu.
 
 * **URL**
 
@@ -102,7 +102,7 @@ Run the `install` and `start` commands for email-service, order-service and rest
 }`
 ## Place a new order
 ----
-  Returns json containing order details.
+  Returns json containing details of the placed order.
 
 * **URL**
 
@@ -155,7 +155,7 @@ Run the `install` and `start` commands for email-service, order-service and rest
 
 ## Get order details
 ----
-  Returns json data containing details of all books.
+  Returns json data containing order details and the updated order status.
 
 * **URL**
 
