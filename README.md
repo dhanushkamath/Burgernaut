@@ -42,13 +42,13 @@ To get the Node server running locally:
     ```
 
 ## API
-## Add a new book
+## Place a new order
 ----
-  Returns json containing newly added data.
+  Returns json containing order details.
 
 * **URL**
 
-  /api/books
+  /api/orders
 
 * **Method:**
 
@@ -65,34 +65,30 @@ To get the Node server running locally:
  * **Data Params**
    
     **Required:**
-    * `title: [string]`
+    * `items: [array]`
     * `author: [string]`
 
 * **Success Response:**
 
   * **Code:** 201 CREATED<br/>
-    **Content:** `{
-"id": "abcdefg1234,
-"title": "Dockerizing your personal projects",
-"author": "Dhanush Kamath"
-}`
+    **Content:** `{ <to-be-filled> }`
 
 
-## Get all books
+## Get order details
 ----
   Returns json data containing details of all books.
 
 * **URL**
 
-  /api/books
+  /api/orders/:id
 
 * **Method:**
 
   `GET`
   
 *  **URL Params**
+   `id: [string]`
    
-   None
     
 *  **Query Params**
    
@@ -105,24 +101,7 @@ To get the Node server running locally:
 * **Success Response:**
 
   * **Code:** 200<br/>
-    **Content:** `{
-    "books": [
-        {
-            "title": "Dockerize your personal projects!",
-            "author": "Dhanush Kamath",
-            "createdAt": "2020-12-24T20:59:42.516Z"
-        },
-        {
-            "title": "Burgers and Cars: An Autobiography",
-            "author": "Dhanush Kamath",
-            "createdAt": "2020-12-24T21:04:27.111Z"
-        }
-    ]
-}`
+    **Content:** `{ <to-be-filled> }`
  
-
 ## Authors
 * **Dhanush Kamath** - [dhanushkamath](https://github.com/dhanushkamath)
-=======
-A distributed message-based food ordering system developed with RabbitMQ, Node.js, Express and MongoDB
->>>>>>> af269ebbddb7cc34a6011341b5a2ba567224a3cf
