@@ -1,5 +1,6 @@
 # Burgernaut
-A message-based distributed food ordering system developed with RabbitMQ, Node.js, Express and MongoDB
+<<<<<<< HEAD
+A distributed message-based food ordering system developed with RabbitMQ, Node.js, Express and MongoDB
 
 # System Architecture
 ![Burgernaut System Architecture](https://github.com/dhanushkamath/Burgernaut/tree/main/docs/burgernaut-system.png)
@@ -122,3 +123,6 @@ To get the Node server running locally:
 
 ## Authors
 * **Dhanush Kamath** - [dhanushkamath](https://github.com/dhanushkamath)
+=======
+A distributed message-based food ordering system developed with RabbitMQ, Node.js, Express and MongoDB
+>>>>>>> af269ebbddb7cc34a6011341b5a2ba567224a3cf
