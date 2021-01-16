@@ -2,12 +2,13 @@
 A message-based distributed food ordering system developed with RabbitMQ, Node.js, Express and MongoDB
 
 # System Architecture
-![alt text](/docs/burgernaut.png)
+![Burgernaut System Architecture](https://github.com/dhanushkamath/Burgernaut/tree/main/docs/burgernaut-system.png)
 ## Getting Started (with Docker)
 If you have Docker installed in your computer, you do not need to have Node.js, RabbitMQ or MongoDB installed. You can run the application with a single command:
   ```bash
   $ docker-compose up
   ```
+Note: email-service requires a valid email ID and password to send order confirmations. Please update them in the <i>environment</i> section of <i>email-service</i> in <i>docker-compose.yml</i>.
 ## Getting Started (without Docker)
 Without Docker, you need to install RabbitMQ, Node.js, NPM, MongoDB. </br>
 To install Node.js and NPM, refer to the documentation provided [here](https://nodejs.org/en/download/package-manager).</br>
