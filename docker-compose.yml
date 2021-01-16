@@ -45,7 +45,6 @@ services:
       - EMAIL_SERVICE=gmail # Enter email service 
       - SLEEP_TIME=20000
   
-
   mongo: # database
     image: mongo:4.2 # pull the mongo image from docker hub
     logging:
@@ -59,6 +58,3 @@ services:
       driver: none
     ports:
       - '5672:5672'
-        
-
-    

@@ -1,6 +1,7 @@
 const amqp = require("amqplib");
 const { sendConfirmation } = require('../controllers/emailController')
 const { logger } = require('./loggerService')
+const {EXCHANGE, QUEUE} = require('../resources/constants');
 const PREFETCH_COUNT = parseInt(process.env.PREFETCH_COUNT) || 2;
 const MQ_HOST = process.env.MQ_HOST || 'localhost';
 const MQ_URL = `amqp://${MQ_HOST}:5672`;
@@ -16,20 +17,19 @@ const amqpConnectAndConsume = async () => {
         
         orderChannel = await mqConnection.createChannel();
         
-        var exchange = 'orders';
-        await orderChannel.assertExchange(exchange, 'fanout', {
+        await orderChannel.assertExchange(EXCHANGE, 'fanout', {
             durable: false
         });
 
         // Ensure that the queue exists or create one if it doesn't
-        await orderChannel.assertQueue("email-queue");
-        await orderChannel.bindQueue("email-queue", exchange, '');
+        await orderChannel.assertQueue(QUEUE);
+        await orderChannel.bindQueue(QUEUE, EXCHANGE, '');
         
 
         // Only send <PREFETCH_COUNT> emails at a time
         orderChannel.prefetch(PREFETCH_COUNT);
 
-        orderChannel.consume("email-queue", order => {
+        orderChannel.consume(QUEUE, order => {
             sendConfirmation(order, orderChannel);
         });
     }

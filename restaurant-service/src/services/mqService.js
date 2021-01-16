@@ -1,6 +1,7 @@
 const amqp = require("amqplib");
 const { processOrder } = require('../controllers/orderController');
-const { logger } = require('./loggerService')
+const { logger } = require('./loggerService');
+const {EXCHANGE, QUEUE} = require('../resources/constants');
 const PREFETCH_COUNT = parseInt(process.env.PREFETCH_COUNT) || 2;
 const ORDER_DELIVERY_TIME = parseInt(process.env.ORDER_DELIVERY_TIME) || 10000;
 const MQ_HOST = process.env.MQ_HOST || 'localhost';
@@ -16,20 +17,19 @@ const amqpConnectAndConsume = async () => {
         
         orderChannel = await mqConnection.createChannel();
         
-        var exchange = 'orders'
-        await orderChannel.assertExchange(exchange, 'fanout', {
+        await orderChannel.assertExchange(EXCHANGE, 'fanout', {
             durable: false
         });
 
         // Ensure that the queue exists or create one if it doesn't
-        await orderChannel.assertQueue("order-queue");
-        await orderChannel.bindQueue("order-queue", exchange, '');
+        await orderChannel.assertQueue(QUEUE);
+        await orderChannel.bindQueue(QUEUE, EXCHANGE, '');
 
         // Only process <PREFETCH_COUNT> orders at a time
         orderChannel.prefetch(PREFETCH_COUNT);
         logger.info(`AMQP - connection established at ${MQ_URL} with prefetch count ${PREFETCH_COUNT} and delivery time ${ORDER_DELIVERY_TIME}ms`)
 
-        orderChannel.consume("order-queue", order => {
+        orderChannel.consume(QUEUE, order => {
             processOrder(order, orderChannel);
         });
     }
