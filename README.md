@@ -1,15 +1,30 @@
 # Burgernaut
-<<<<<<< HEAD
-A distributed message-based food ordering system developed with RabbitMQ, Node.js, Express and MongoDB
+A distributed message-based food ordering system developed with RabbitMQ, Node.js, Express and MongoDB.
 
-# System Architecture
-![Burgernaut System Architecture](https://github.com/dhanushkamath/Burgernaut/tree/main/docs/burgernaut-system.png)
+# System Architecture and Flow
+Burgernaut is a distributed food ordering platform that allows clients to place orders and track them. It consists of three integral components - `order-service`, `restaurant-service` and `email-service`. The `order-service` exposes REST endpoints that allow clients to fetch the food menu, place an order and track the order in real-time. Once the client places an order, the `order-service` persists the order details on a MongoDB server and publishes it to a RabbitMQ Exchange. The Exchange is configured with a fanout pattern which publishes the order to the two queues that have been bound to it - `order.process` and `order.confirmation`. While placing it on the queue, the 'status' field of the order holds the value 'pending'. A `restaurant-service` consumes the order from the `order.process` queue and an `email-service` consumes the order from the `order.confirmation` queue. Once the `restaurant-service` consumes the order, it modifies the 'state' of the order to 'accepted' in the database. The `email-service` on the other hand sends an order confirmation to the email address specified in the order. After a pre-defined time period, the `restaurant-service` modifies the 'state' to 'delivered' in the database. The `order-service` can also be used to track an order with the order ID which is returned while placing an order. 
+
+Burgernaut uses a message-based architecture to promote scalability, flexibility and loose coupling among the various services it comprises. RabbitMQ, by default, ensures that all the messages consumed from a queue are distributed in a round robin manner. Since the `restaurant-service` and `email-service` consume from these queues, they can be individually and independently scaled - though physically, scaling restaurant-service would mean opening new restaurants. The services are configured to process only a limited number of orders at a time to mimic the actual business since restaurants have limited staff. The remaining orders wait on the queue to be consumed. If one of the restaurants stop functioning say, due to a power loss, RabbitMQ is aware that tcp connection between the restaurant-service and the Exchange has been closed and any order that was being processed is automatically added back to the queue, ready to be consumed by another restaurant-service. This enhances the fault-tolerance of the system. The number of orders that can be handled by the `restaurant-service` and the amount of time it takes to process an order can be configured with their respective environment variables.
+
+As is evident, the system required asynchronous communication for its components which are difficult to achieve with REST or RPC based systems as they are inherently blocking in nature. The system also required a highly-available and fault-tolerant queueing service for queueing the orders to prevent overwhelming the downstream components during peak time. This also enhances the user experience as instead of rejecting an order at peak load intervals, the order gets queued and a response is sent immediately to the client. Simply put, it tells the client - "Hey, I got your order and we are working on it. Here's an order confirmation ID to track it." As soon as a restaurant is available, it will consume it.
+
+![Burgernaut System Architecture](docs/burgernaut-system.png)
 ## Getting Started (with Docker)
 If you have Docker installed in your computer, you do not need to have Node.js, RabbitMQ or MongoDB installed. You can run the application with a single command:
   ```bash
   $ docker-compose up
   ```
-Note: email-service requires a valid email ID and password to send order confirmations. Please update them in the <i>environment</i> section of <i>email-service</i> in <i>docker-compose.yml</i>.
+Note: email-service requires a valid email ID and password to send order confirmations. Update them in the <i>environment</i> section of <i>email-service</i> in <i>docker-compose.yml</i>. The application can be tweaked with the environment variables defined in this file.
+
+To scale each component independently, use:
+  ```bash
+  $ docker-compose scale <service-name>=<number-of-containers>
+  ```
+
+For example, use the below command to replicate the architecture displayed in the system architecture diagram:
+  ```bash
+  $ docker-compose scale restaurant-service=2
+  ```
 ## Getting Started (without Docker)
 Without Docker, you need to install RabbitMQ, Node.js, NPM, MongoDB. </br>
 To install Node.js and NPM, refer to the documentation provided [here](https://nodejs.org/en/download/package-manager).</br>
@@ -32,7 +47,7 @@ To get the Node server running locally:
     ```bash
     $ npm install
     ```
-- `npm run start` to start the local server. Run this for email-service, order-service and restaurant-service:
+- `npm start` to start the local server:
     ```bash
     $ npm run start
     ```
@@ -40,15 +55,16 @@ To get the Node server running locally:
     ```bash
     $ npm run dev
     ```
+Run the `install` and `start` commands for email-service, order-service and restaurant-service.
 
 ## API
-## Add a new book
+## Place a new order
 ----
-  Returns json containing newly added data.
+  Returns json containing order details.
 
 * **URL**
 
-  /api/books
+  /api/orders
 
 * **Method:**
 
@@ -65,34 +81,32 @@ To get the Node server running locally:
  * **Data Params**
    
     **Required:**
-    * `title: [string]`
-    * `author: [string]`
+    * `items: [array]`
+      * `name: [string]`
+      * `quantity: [number]`
+    * `email: [string]`
 
 * **Success Response:**
 
   * **Code:** 201 CREATED<br/>
-    **Content:** `{
-"id": "abcdefg1234,
-"title": "Dockerizing your personal projects",
-"author": "Dhanush Kamath"
-}`
+    **Content:** `{ <to-be-filled> }`
 
 
-## Get all books
+## Get order details
 ----
   Returns json data containing details of all books.
 
 * **URL**
 
-  /api/books
+  /api/orders/:id
 
 * **Method:**
 
   `GET`
   
 *  **URL Params**
+   `id: [string]`
    
-   None
     
 *  **Query Params**
    
@@ -105,24 +119,7 @@ To get the Node server running locally:
 * **Success Response:**
 
   * **Code:** 200<br/>
-    **Content:** `{
-    "books": [
-        {
-            "title": "Dockerize your personal projects!",
-            "author": "Dhanush Kamath",
-            "createdAt": "2020-12-24T20:59:42.516Z"
-        },
-        {
-            "title": "Burgers and Cars: An Autobiography",
-            "author": "Dhanush Kamath",
-            "createdAt": "2020-12-24T21:04:27.111Z"
-        }
-    ]
-}`
+    **Content:** `{ <to-be-filled> }`
  
-
 ## Authors
 * **Dhanush Kamath** - [dhanushkamath](https://github.com/dhanushkamath)
-=======
-A distributed message-based food ordering system developed with RabbitMQ, Node.js, Express and MongoDB
->>>>>>> af269ebbddb7cc34a6011341b5a2ba567224a3cf
