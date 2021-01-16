@@ -2,12 +2,11 @@
 A distributed message-based food ordering system developed with RabbitMQ, Node.js, Express and MongoDB.
 
 # System Architecture and Flow
-Burgernaut is a distributed food ordering platform that allows clients to place orders and track them. It consists of three integral components - `order-service`, `restaurant-service` and `email-service`. The `order-service` exposes REST endpoints that allow clients to fetch the food menu, place an order and track the order in real-time. Once the client places an order, the `order-service` persists the order details on a MongoDB server and publishes it to a RabbitMQ Exchange. The Exchange is configured with a fanout pattern which publishes the order to the two queues that have been bound to it - `order.process` and `order.confirmation`. While placing it on the queue, the 'status' field of the order holds the value 'pending'. A `restaurant-service` consumes the order from the `order.process` queue and an `email-service` consumes the order from the `order.confirmation` queue. Once the `restaurant-service` consumes the order, it modifies the 'state' of the order to 'accepted' in the database. The `email-service` on the other hand sends an order confirmation to the email address specified in the order. After a pre-defined time period, the `restaurant-service` modifies the 'state' to 'delivered' in the database. The `order-service` can also be used to track an order with the order ID which is returned while placing an order. 
+Burgernaut is a distributed food ordering platform that allows clients to place orders and track them. It consists of three integral components - `order-service`, `restaurant-service` and `email-service`. The `order-service` exposes REST endpoints that allow clients to fetch the food menu, place an order and track the order in real-time. Once the client places an order, the `order-service` persists the order details on a MongoDB server and publishes it to a RabbitMQ Exchange. The Exchange is configured with a fanout pattern which publishes the order to the two queues that have been bound to it - `order.process` and `order.confirmation`. While placing it on the queue, the 'status' field of the order holds the value 'pending'. A `restaurant-service` consumes the order from the `order.process` queue and an `email-service` consumes the order from the `order.confirmation` queue. Once the `restaurant-service` consumes the order, it modifies the 'state' of the order to 'accepted' in the database. The `email-service` on the other hand sends an order confirmation to the email address specified in the order. After a pre-defined time period, the `restaurant-service` modifies the 'state' to 'delivered' in the database. The `order-service` can also be used to track an order with the order ID that is returned while placing an order. 
 
-Burgernaut uses a message-based architecture to promote scalability, flexibility and loose coupling among the various services it comprises. RabbitMQ, by default, ensures that all the messages consumed from a queue are distributed in a round robin manner. Since the `restaurant-service` and `email-service` consume from these queues, they can be individually and independently scaled - though physically, scaling restaurant-service would mean opening new restaurants. The services are configured to process only a limited number of orders at a time to mimic the actual business since restaurants have limited staff. The remaining orders wait on the queue to be consumed. If one of the restaurants stop functioning say, due to a power loss, RabbitMQ is aware that tcp connection between the restaurant-service and the Exchange has been closed and any order that was being processed is automatically added back to the queue, ready to be consumed by another restaurant-service. This enhances the fault-tolerance of the system. The number of orders that can be handled by the `restaurant-service` and the amount of time it takes to process an order can be configured with their respective environment variables.
+Burgernaut uses a message-based architecture to enhance scalability, flexibility and loose coupling among the various services it comprises. RabbitMQ, by default, ensures that all the messages consumed from a queue are distributed in a round-robin manner. Since the `restaurant-service` and `email-service` consume from these queues, they can be individually and independently scaled - though physically, scaling out the restaurant-service would mean opening new restaurants. The services are configured to process only a limited number of orders at a time to mimic actual business since restaurants have limited staff. The remaining orders wait on the queue to be consumed. The `restaurant-service` is required to send an 'acknowledge' to RabbitMQ to confirm that the order has been fully processed - delivered, in our case. If one of the restaurants stop functioning say, due to a power loss, RabbitMQ is aware that the tcp connection between the restaurant-service and the Exchange has been closed and any order that was being processed is automatically added back to the queue, ready to be consumed by another restaurant-service. This enhances the fault-tolerance of the system. The number of orders that can be handled by the `restaurant-service` and the amount of time it takes to process an order can be configured with their respective environment variables.
 
-As is evident, the system required asynchronous communication for its components which are difficult to achieve with REST or RPC based systems as they are inherently blocking in nature. The system also required a highly-available and fault-tolerant queueing service for queueing the orders to prevent overwhelming the downstream components during peak time. This also enhances the user experience as instead of rejecting an order at peak load intervals, the order gets queued and a response is sent immediately to the client. Simply put, it tells the client - "Hey, I got your order and we are working on it. Here's an order confirmation ID to track it." As soon as a restaurant is available, it will consume it.
-
+As is evident, the system required asynchronous communication for its components which are difficult to achieve with REST or RPC based systems as they are inherently blocking in nature. The system also required a highly-available and fault-tolerant queueing service for queueing the orders to prevent overwhelming the downstream components during peak time. RabbitMQ aids in satisfying these requirements. This also enhances the user experience. Instead of rejecting an order at peak load intervals, the order gets queued and a response is sent immediately to the client. As soon as a restaurant is available, it will consume it. Simply put, it tells the client - "Hey, I got your order and we are working on it. Here's an order confirmation ID to track it." 
 ![Burgernaut System Architecture](docs/burgernaut-system.png)
 ## Getting Started (with Docker)
 If you have Docker installed in your computer, you do not need to have Node.js, RabbitMQ or MongoDB installed. You can run the application with a single command:
@@ -18,12 +17,12 @@ Note: email-service requires a valid email ID and password to send order confirm
 
 To scale each component independently, use:
   ```bash
-  $ docker-compose scale <service-name>=<number-of-containers>
+  $ docker-compose up --scale <service-name>=<number-of-containers>
   ```
 
 For example, use the below command to replicate the architecture displayed in the system architecture diagram:
   ```bash
-  $ docker-compose scale restaurant-service=2
+  $ docker-compose up --scale restaurant-service=2
   ```
 ## Getting Started (without Docker)
 Without Docker, you need to install RabbitMQ, Node.js, NPM, MongoDB. </br>
@@ -58,6 +57,49 @@ To get the Node server running locally:
 Run the `install` and `start` commands for email-service, order-service and restaurant-service.
 
 ## API
+## Get menu
+----
+  Returns json data containing details of all books.
+
+* **URL**
+
+  /api/menu
+
+* **Method:**
+
+  `GET`
+  
+*  **URL Params**
+   None
+   
+    
+*  **Query Params**
+   
+   None
+    
+ * **Data Params**
+   
+  None
+
+* **Success Response:**
+
+  * **Code:** 200<br/>
+    **Content:** `{
+    "items": [
+        {
+            "name": "burger",
+            "price": 50
+        },
+        {
+            "name": "fries",
+            "price": 20
+        },
+        {
+            "name": "coke",
+            "price": 10
+        }
+    ]
+}`
 ## Place a new order
 ----
   Returns json containing order details.
@@ -82,7 +124,6 @@ Run the `install` and `start` commands for email-service, order-service and rest
    
     **Required:**
     * `items: [array]`
-    * `author: [string]`
       * `name: [string]`
       * `quantity: [number]`
     * `email: [string]`
@@ -90,7 +131,26 @@ Run the `install` and `start` commands for email-service, order-service and rest
 * **Success Response:**
 
   * **Code:** 201 CREATED<br/>
-    **Content:** `{ <to-be-filled> }`
+    **Content:** `{
+    "total": 900,
+    "status": "pending",
+    "_id": "600307ce7a72ea0013a034f6",
+    "items": [
+        {
+            "name": "burger",
+            "quantity": 10,
+            "_id": "600307ce7a72ea0013a034f7"
+        },
+        {
+            "name": "fries",
+            "quantity": 20,
+            "_id": "600307ce7a72ea0013a034f8"
+        }
+    ],
+    "email": "test@gmail.com",
+    "createdAt": "2021-01-16T15:35:42.975Z",
+    "__v": 0
+}`
 
 
 ## Get order details
@@ -108,7 +168,6 @@ Run the `install` and `start` commands for email-service, order-service and rest
 *  **URL Params**
    `id: [string]`
    
-    
 *  **Query Params**
    
    None
@@ -120,7 +179,23 @@ Run the `install` and `start` commands for email-service, order-service and rest
 * **Success Response:**
 
   * **Code:** 200<br/>
-    **Content:** `{ <to-be-filled> }`
+    **Content:** `{
+    "total": 900,
+    "status": "delivered",
+    "_id": "600307ce7a72ea0013a034f6",
+    "items": [
+        {
+            "name": "burger",
+            "quantity": 10
+        },
+        {
+            "name": "fries",
+            "quantity": 20
+        }
+    ],
+    "email": "test@gmail.com",
+    "createdAt": "2021-01-16T15:35:42.975Z"
+}`
  
 ## Authors
 * **Dhanush Kamath** - [dhanushkamath](https://github.com/dhanushkamath)
