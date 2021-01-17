@@ -1,15 +1,43 @@
 # Burgernaut
+
+<p align="center">
 A distributed message-based food ordering system developed with RabbitMQ, Node.js, Express and MongoDB.
 
-# System Architecture and Flow
-Burgernaut is a distributed food ordering platform that allows clients to place orders and track them. It consists of three integral components - `order-service`, `restaurant-service` and `email-service`. The `order-service` exposes REST endpoints that allow clients to fetch the food menu, place an order and track the order in real-time. The `order-service` can also be used to track an order with the order ID that is returned while placing an order. Once the client places an order, the `order-service` persists the order details on a MongoDB server and publishes it to a RabbitMQ Exchange. The Exchange is configured with a fanout pattern which publishes the order to the two queues that have been bound to it - `order.process` and `order.confirmation`. While placing it on the queue, the 'status' field of the order holds the value 'pending'. A `restaurant-service` consumes the order from the `order.process` queue and an `email-service` consumes the order from the `order.confirmation` queue. Once the `restaurant-service` consumes the order, it modifies the 'state' of the order to 'accepted' in the database. The `email-service` on the other hand sends an order confirmation to the email address specified in the order. After a pre-defined time period, the `restaurant-service` modifies the 'state' to 'delivered' in the database. 
+<p align="center">
+  <a href="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Node.js_logo_2015.svg/1200px-Node.js_logo_2015.svg.png">
+    <img alt="Node" src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Node.js_logo_2015.svg/1200px-Node.js_logo_2015.svg.png" height=50 width=186/>
+  </a>
+  <a href="https://webassets.mongodb.com/_com_assets/cms/MongoDB_Logo_FullColorBlack_RGB-4td3yuxzjs.png">
+    <img alt="Mongo" src="https://webassets.mongodb.com/_com_assets/cms/MongoDB_Logo_FullColorBlack_RGB-4td3yuxzjs.png" height=50 width=185/>
+  </a>
+  <a href="https://upload.wikimedia.org/wikipedia/commons/7/71/RabbitMQ_logo.svg">
+    <img alt="RabbitMQ" src = "https://upload.wikimedia.org/wikipedia/commons/7/71/RabbitMQ_logo.svg" height=50 width=318>
+  </a>
+  <a href="https://www.docker.com/sites/default/files/d8/2019-07/vertical-logo-monochromatic.png">
+    <img alt="Docker" src = "https://www.docker.com/sites/default/files/d8/2019-07/vertical-logo-monochromatic.png" height=50 width=58>
+  </a>
+</p>
+<br>
 
-Burgernaut uses a message-based architecture to enhance scalability, flexibility and loose coupling among the various services it comprises. RabbitMQ, by default, ensures that all the messages consumed from a queue are distributed in a round-robin manner. Since the `restaurant-service` and `email-service` consume from these queues, they can be individually and independently scaled - though physically, scaling out the restaurant-service would mean opening new restaurants. The services are configured to process only a limited number of orders at a time to mimic actual business since restaurants have limited staff. The remaining orders wait on the queue to be consumed. The `restaurant-service` is required to send an 'acknowledge' to RabbitMQ to confirm that the order has been fully processed - delivered, in our case. If one of the restaurants stop functioning say, due to a power loss, RabbitMQ is aware that the tcp connection between the restaurant-service and the Exchange has been closed and any order that was being processed is automatically added back to the queue, ready to be consumed by another restaurant-service. This enhances the fault-tolerance of the system. The number of orders that can be handled by the `restaurant-service` and the amount of time it takes to process an order can be configured with their respective environment variables.
+# Table of Contents
+- [System Architecture and Flow](#system-architecture-and-flow)
+- [Getting Started with Docker](#getting-started-with-docker)
+- [Getting Started without Docker](#getting-started-without-docker)
+- [API](#api)
+<br>
 
-As is evident, the system required asynchronous communication for its components which are difficult to achieve with REST or RPC based systems as they are inherently blocking in nature. The system also required a highly-available and fault-tolerant queueing service for queueing the orders to prevent overwhelming the downstream components during peak time. RabbitMQ aids in satisfying these requirements. This also enhances the user experience. Instead of rejecting an order at peak load intervals, the order gets queued and a response is sent immediately to the client. As soon as a restaurant is available, it will consume it. Simply put, it tells the client - "Hey, we got your order and are working on it. Here's an order confirmation ID to track it." 
-<br><br>
+## System Architecture and Flow
+<br>
+
 ![Burgernaut System Architecture](docs/burgernaut-system.png)
-## Getting Started (with Docker)
+<br><br>
+Burgernaut is a distributed food ordering platform that allows clients to place orders and track them. It consists of three integral components - `order-service`, `restaurant-service` and `email-service`. The `order-service` exposes REST endpoints that allow clients to fetch the food menu, place an order and track the order in real-time. Once the client places an order, the `order-service` persists the order details on a MongoDB server, publishes it to a RabbitMQ Exchange and returns a confirmation response which includes the order ID to track the order. The Exchange is configured with a fanout pattern which publishes the order to the two queues that have been bound to it - `order.process` and `order.confirmation`. While placing it on the queue, the 'status' field of the order holds the value 'pending'. A `restaurant-service` consumes the order from the `order.process` queue and an `email-service` consumes the order from the `order.confirmation` queue. Once the `restaurant-service` consumes the order, it modifies the 'state' of the order to 'accepted' in the database. The `email-service` on the other hand sends an order confirmation to the email address specified in the order. After a pre-defined time period, the `restaurant-service` modifies the 'state' to 'delivered' in the database indicating that the order has been delivered. 
+
+Burgernaut uses a message-based architecture to enhance scalability, flexibility and loose coupling among the various services it comprises. RabbitMQ, by default, ensures that all the messages consumed from a queue are distributed in a round-robin fashion. Since the `restaurant-service` and `email-service` consume from these queues, they can be independently scaled - though physically, scaling out the restaurant-service would mean opening new restaurants. The services are configured to process only a limited number of orders at a time to mimic actual business since restaurants have limited staff. The remaining orders wait on the queue to be consumed. The `restaurant-service` sends an 'acknowledge' to RabbitMQ once the order is fully processed - delivered, in our case - to prevent it from being added back onto the queue. If one of the restaurants stop functioning say, due to a power loss, RabbitMQ would be aware that the tcp connection between the restaurant-service and the Exchange has been closed and any order that was being processed is automatically added back onto the queue; ready to be consumed by another restaurant-service. This enhances the fault-tolerance of the system. The number of orders that can be handled by the `restaurant-service` and the amount of time it takes to process an order can be configured with their respective environment variables at the time of deployment.
+
+As is evident, the system required asynchronous communication for its components. This is difficult to achieve with REST or RPC based systems as they are inherently blocking in nature. The system also required a highly-available and fault-tolerant queueing service for queueing the order. This prevents overwhelming the downstream components during peak time. RabbitMQ aids in satisfying these requirements. It also enhances the user experience. Instead of rejecting an order at peak load intervals, the order gets queued and a response is sent immediately to the client. As soon as a restaurant is available, it will consume it. Simply put, it tells the client - "Hey, we got your order and are working on it. Here's an order confirmation ID to track it." 
+
+## Getting Started with Docker
 If you have Docker installed in your computer, you do not need to have Node.js, RabbitMQ or MongoDB installed. You can run the application with a single command:
   ```bash
   $ docker-compose up
@@ -25,7 +53,7 @@ For example, use the below command to replicate the architecture displayed in th
   ```bash
   $ docker-compose up --scale restaurant-service=2
   ```
-## Getting Started (without Docker)
+## Getting Started without Docker
 Without Docker, you need to install RabbitMQ, Node.js, NPM, MongoDB. </br>
 To install Node.js and NPM, refer to the documentation provided [here](https://nodejs.org/en/download/package-manager).</br>
 To install MongoDB, refer to the documentation provided [here](https://docs.mongodb.com/manual/installation/).
@@ -56,6 +84,8 @@ To get the Node server running locally:
     $ npm run dev
     ```
 Run the `install` and `start` commands for email-service, order-service and restaurant-service.
+
+
 
 ## API
 ## Get menu
