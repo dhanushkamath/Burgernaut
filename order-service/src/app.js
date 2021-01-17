@@ -6,14 +6,15 @@ const { logger } = require('./services/loggerService');
 const { errorHandlerMiddleware } = require('./services/errorHandlingService');
 const { mongoConnect } = require('./services/mongoService');
 const PORT = process.env.PORT || 3000;
+const { injectExchangeService, amqpConnect } = require('./services/mqService');
 
 startServer = () => {
     // mongo connection
     mongoConnect();
 
-    // amqp exchange services
-    const { injectExchangeService } = require('./services/mqService');
-
+    // establish mq connection
+    amqpConnect();
+    
     // create an express app
     const app = express();
 
@@ -34,7 +35,7 @@ startServer = () => {
 
 
     app.listen(PORT, () => {
-        logger.info(`Order-service listening on port ${PORT}`);
+        logger.info(`order-service listening on port ${PORT}`);
     })
 }
 

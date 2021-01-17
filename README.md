@@ -197,6 +197,7 @@ Run the `install` and `start` commands for email-service, order-service and rest
   `GET`
   
 *  **URL Params**
+
    `id: [string]`
    
 *  **Query Params**

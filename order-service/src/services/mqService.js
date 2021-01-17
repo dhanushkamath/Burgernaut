@@ -1,11 +1,10 @@
 const amqp = require("amqplib");
 const { logger } = require('./loggerService')
-
-// create MQ connection string using environment variable
-const MQ_HOST = process.env.MQ_HOST || 'localhost';
+const MQ_HOST = process.env.MQ_HOST || 'localhost'; // create MQ connection string using environment variable
 const MQ_URL = `amqp://${MQ_HOST}:5672`;
+const EXCHANGE = "orders";
 let orderChannel = null;
-var exchange = "orders"
+
 
 /**
  * Connect to RabbitMQ
@@ -15,7 +14,7 @@ const amqpConnect = async () => {
         const mqConnection = await amqp.connect(MQ_URL);
         orderChannel = await mqConnection.createChannel();
         
-        await orderChannel.assertExchange(exchange, 'fanout', {
+        await orderChannel.assertExchange(EXCHANGE, 'fanout', {
             durable: false
         });
 
@@ -34,7 +33,7 @@ const amqpConnect = async () => {
  * @param {Object} order - order object containing order details
  */
 const publishOrderToExchange = (order) => {
-    orderChannel.publish(exchange,'', Buffer.from(JSON.stringify(order)));
+    orderChannel.publish(EXCHANGE,'', Buffer.from(JSON.stringify(order)));
     logger.info(`AMQP - order ${order._id} placed`);
 }
 
@@ -45,18 +44,16 @@ const publishOrderToExchange = (order) => {
  * @param {Function} next - express next() function.
  */
 const injectExchangeService = (req, res, next) => {
-    // Add all exchange operations here
+    // add all exchange operations here
     const exchangeServices = {
         publishOrderToExchange: publishOrderToExchange
     }
-    
+    // inject exchangeServices in request object
     req.exchangeServices = exchangeServices;
     next();
 }
 
-// establish mq connection
-amqpConnect();
-
 module.exports = {
-    injectExchangeService: injectExchangeService
+    injectExchangeService: injectExchangeService,
+    amqpConnect: amqpConnect
 }

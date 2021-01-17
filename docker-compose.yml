@@ -47,14 +47,14 @@ services:
   
   mongo: # database
     image: mongo:4.2 # pull the mongo image from docker hub
-    logging:
-      driver: none
+    logging: 
+      driver: none # disable logging
     ports:
       - '27017:27017'
   
   rabbitmq: # rabbitmq
     image: rabbitmq:3.8.9 # pull the rabbitmq image from  dockerhub
-    logging:
-      driver: none
+    logging: 
+      driver: none # disable logging
     ports:
       - '5672:5672'

@@ -20,7 +20,7 @@ const mongoConnect = () => {
         }
     })
     mongoose.connection.on('connected', function () {  
-        logger.log('info',`Mongoose - connection successful: ${MONGO_URI}`);
+        logger.log('info',`Mongoose - connection established at ${MONGO_URI}`);
     }); 
     
     // If the connection throws an error
