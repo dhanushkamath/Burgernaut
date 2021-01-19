@@ -1,13 +1,6 @@
 # Burgernaut
-
 <p align="center">
-A distributed message-based food ordering system developed with RabbitMQ, Node.js, Express and MongoDB.
-<br>
-Head over to my article - [Developing Message-Based Applications with RabbitMQ](https://medium.com/swlh/rabbitmq-developing-message-based-applications-a56003c55649) published on The Startup to read more about it!
-
-<br>
-
-<p align="center">
+A distributed message-based food ordering system developed with RabbitMQ, Node.js, Express and MongoDB. 
   <a href="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Node.js_logo_2015.svg/1200px-Node.js_logo_2015.svg.png">
     <img alt="Node" src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Node.js_logo_2015.svg/1200px-Node.js_logo_2015.svg.png" height=50 width=186/>
   </a>
@@ -20,6 +13,8 @@ Head over to my article - [Developing Message-Based Applications with RabbitMQ](
   <a href="https://www.docker.com/sites/default/files/d8/2019-07/vertical-logo-monochromatic.png">
     <img alt="Docker" src = "https://www.docker.com/sites/default/files/d8/2019-07/vertical-logo-monochromatic.png" height=50 width=58>
   </a>
+  <br>
+     Head over to my article - <a href="https://medium.com/swlh/rabbitmq-developing-message-based-applications-a56003c55649">Developing Message-Based Applications with RabbitMQ</a> published on The Startup to read more about it!
 </p>
 <br>
 
