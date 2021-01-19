@@ -13,8 +13,8 @@ A distributed message-based food ordering system developed with RabbitMQ, Node.j
   <a href="https://www.docker.com/sites/default/files/d8/2019-07/vertical-logo-monochromatic.png">
     <img alt="Docker" src = "https://www.docker.com/sites/default/files/d8/2019-07/vertical-logo-monochromatic.png" height=50 width=58>
   </a>
-  <br>
-     Head over to my article - <a href="https://medium.com/swlh/rabbitmq-developing-message-based-applications-a56003c55649">Developing Message-Based Applications with RabbitMQ</a> published on The Startup to read more about it!
+  <br><br>
+     Head over to my article - <a href="https://medium.com/swlh/rabbitmq-developing-message-based-applications-a56003c55649">Developing Message-Based Applications with RabbitMQ</a> published on The Startup to read more!
 </p>
 <br>
 
